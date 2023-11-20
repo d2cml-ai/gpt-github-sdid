@@ -6,7 +6,7 @@ cd $main
 
 import delimited build/output/pushes_clean.csv
 
-gen pushes_p100k = pushes_pc * 100
+gen pushes_p100k = pushes_pc * 100000
 
 cd ${main}/analysis/output
 
