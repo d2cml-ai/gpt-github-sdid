@@ -2,11 +2,13 @@ import pandas as pd
 import pycountry
 from countryinfo import CountryInfo as CInfo
 
+# clean git pushes
+
 pushes_data = pd.read_csv("build/input/git_pushes.csv")
 
 country_data_counts = pushes_data.groupby(["iso2_code"]).count().reset_index()
 
-full_country_codes = country_data_counts[country_data_counts.git_pushes == 13]["iso2_code"].reset_index(drop = True)
+full_country_codes = country_data_counts[country_data_counts.git_pushes == 14]["iso2_code"].reset_index(drop = True)
 
 pushes_data_clean = pushes_data[pushes_data.iso2_code.isin(full_country_codes)]
 
@@ -102,5 +104,17 @@ country_populations = create_populations_dictionary()
 pushes_data_clean["population"] = pushes_data_clean["iso2_code"].map(country_populations)
 pushes_data_clean["pushes_pc"] = pushes_data_clean["git_pushes"] / pushes_data_clean["population"]
 
-
 pushes_data_clean.to_csv("build/output/pushes_clean.csv", index = False)
+
+# add developers data
+
+developers = pd.read_csv("build/input/developers.csv")
+
+main_data = pd.merge(pushes_data_clean, developers, how="left", on=["iso2_code", "year", "quarter"])
+
+main_data["developers_pc"] = main_data["developers"] / main_data["population"]
+
+main_data["pushes_perdev"] = main_data["git_pushes"] / main_data["developers"]
+
+main_data.to_csv("build/output/main.csv", index=False)
+
